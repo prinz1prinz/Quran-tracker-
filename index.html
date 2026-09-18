@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رفيقي في حفظ سورة يوسف</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1F4B3F">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="حفظ يوسف">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F1E4;
+    --surface:#FFFDF8;
+    --surface-alt:#EFE6D0;
+    --line:#E1D6B8;
+    --ink:#28221A;
+    --muted:#8A806E;
+    --primary:#1F4B3F;
+    --primary-dark:#15352C;
+    --primary-soft:#DCE9E2;
+    --gold:#AD7D26;
+    --memorized:#3F7D52;
+    --memorized-soft:#E4F0E6;
+    --reviewing:#C08A28;
+    --reviewing-soft:#F6ECD8;
+    --focus:#AE4E3B;
+    --focus-soft:#F5E4DF;
+    --new:#9B927E;
+    --new-soft:#EFEAE0;
+    --radius:8px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Tajawal', Tahoma, Arial, sans-serif;
+    line-height:1.6;
+    min-height:100vh;
+    padding-bottom:40px;
+  }
+  h1,h2,h3{font-family:'Amiri', 'Tajawal', serif;font-weight:700;margin:0;}
+  button{font-family:inherit;}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px;}
+
+  /* Header */
+  header.app-header{
+    background:var(--primary);
+    color:#F6F1E4;
+    padding:28px 0 22px;
+    border-bottom:4px solid var(--gold);
+  }
+  header.app-header h1{font-size:1.7rem;color:#fff;}
+  header.app-header .subtitle{color:#CFE0D8;font-size:0.92rem;margin-top:4px;}
+  .overall-progress{margin-top:18px;}
+  .overall-progress .row{display:flex;justify-content:space-between;align-items:baseline;font-size:0.85rem;margin-bottom:6px;color:#DCEBE3;}
+  .overall-progress .row b{color:#fff;font-size:1rem;}
+  .bar-track{background:rgba(255,255,255,0.18);border-radius:20px;height:10px;overflow:hidden;}
+  .bar-fill{background:linear-gradient(90deg,var(--gold),#D3A94E);height:100%;border-radius:20px;transition:width .35s ease;}
+
+  /* Tabs */
+  nav.tabs{
+    display:flex;
+    gap:4px;
+    margin-top:18px;
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;
+  }
+  nav.tabs button{
+    background:none;
+    border:none;
+    padding:14px 6px;
+    font-size:0.95rem;
+    font-weight:700;
+    color:var(--muted);
+    border-bottom:3px solid transparent;
+    cursor:pointer;
+    white-space:nowrap;
+    flex:1;
+  }
+  nav.tabs button.active{color:var(--primary);border-bottom-color:var(--gold);}
+
+  main{margin-top:22px;}
+  section.tab-panel{display:none;}
+  section.tab-panel.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    margin-bottom:16px;
+  }
+  .card h2{font-size:1.15rem;color:var(--primary-dark);margin-bottom:4px;}
+  .card .hint{color:var(--muted);font-size:0.85rem;margin-bottom:14px;}
+
+  /* Daily tab */
+  .today-date{font-size:0.85rem;color:var(--muted);margin-bottom:2px;}
+  .goal-box{
+    background:var(--surface-alt);
+    border-radius:var(--radius);
+    padding:12px 14px;
+    margin-bottom:16px;
+    font-size:0.92rem;
+  }
+  .goal-box b{color:var(--primary-dark);}
+  .counter-area{display:flex;align-items:center;gap:12px;justify-content:center;margin:18px 0;}
+  .counter-btn{
+    width:48px;height:48px;border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--surface);
+    font-size:1.4rem;
+    color:var(--primary);
+    cursor:pointer;
+  }
+  .counter-btn:active{background:var(--primary-soft);}
+  .counter-value{font-size:2rem;font-weight:700;color:var(--primary-dark);min-width:64px;text-align:center;}
+  .today-progress .row{display:flex;justify-content:space-between;font-size:0.85rem;color:var(--muted);margin-bottom:6px;}
+  .track-light{background:var(--surface-alt);border-radius:20px;height:10px;overflow:hidden;}
+  .track-light .fill{background:var(--primary);height:100%;border-radius:20px;transition:width .3s ease;}
+
+  .history-list{margin-top:16px;font-size:0.85rem;}
+  .history-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);color:var(--muted);}
+  .history-row:last-child{border-bottom:none;}
+
+  /* Blocks tab */
+  .blocks-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:480px){.blocks-grid{grid-template-columns:1fr;}}
+  .block-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-inline-end:5px solid var(--new);
+    border-radius:var(--radius);
+    padding:12px 14px;
+  }
+  .block-card.status-memorized{border-inline-end-color:var(--memorized);background:var(--memorized-soft);}
+  .block-card.status-reviewing{border-inline-end-color:var(--reviewing);background:var(--reviewing-soft);}
+  .block-card.status-focus{border-inline-end-color:var(--focus);background:var(--focus-soft);}
+  .block-card.status-new{border-inline-end-color:var(--new);background:var(--new-soft);}
+  .block-card .title{font-weight:700;color:var(--primary-dark);font-size:0.98rem;}
+  .block-card .range{color:var(--muted);font-size:0.82rem;margin-bottom:10px;}
+  .status-chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{
+    border:1px solid var(--line);
+    background:var(--surface);
+    border-radius:20px;
+    padding:4px 10px;
+    font-size:0.75rem;
+    cursor:pointer;
+    color:var(--muted);
+  }
+  .chip.active-memorized{background:var(--memorized);color:#fff;border-color:var(--memorized);}
+  .chip.active-reviewing{background:var(--reviewing);color:#fff;border-color:var(--reviewing);}
+  .chip.active-focus{background:var(--focus);color:#fff;border-color:var(--focus);}
+  .chip.active-new{background:var(--new);color:#fff;border-color:var(--new);}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:0.78rem;color:var(--muted);margin-bottom:14px;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .dot.memorized{background:var(--memorized);}
+  .dot.reviewing{background:var(--reviewing);}
+  .dot.focus{background:var(--focus);}
+  .dot.new{background:var(--new);}
+
+  /* Schedule tab */
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px;}
+  .field input, .field select{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:var(--surface);
+    font-family:inherit;
+    font-size:0.95rem;
+    color:var(--ink);
+  }
+  .mode-toggle{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:14px;}
+  .mode-toggle button{
+    flex:1;padding:10px;border:none;background:var(--surface);color:var(--muted);cursor:pointer;font-size:0.88rem;
+  }
+  .mode-toggle button.active{background:var(--primary);color:#fff;}
+  .btn-primary{
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    padding:11px 20px;
+    border-radius:6px;
+    font-weight:700;
+    cursor:pointer;
+    font-size:0.95rem;
+    width:100%;
+  }
+  .btn-primary:hover{background:var(--primary-dark);}
+  .schedule-note{font-size:0.82rem;color:var(--muted);margin-top:10px;}
+
+  table.schedule-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:0.85rem;}
+  table.schedule-table th, table.schedule-table td{
+    border-bottom:1px solid var(--line);
+    padding:8px 6px;
+    text-align:center;
+  }
+  table.schedule-table th{color:var(--primary-dark);background:var(--surface-alt);}
+  table.schedule-table tr.today-row{background:var(--memorized-soft);font-weight:700;}
+  .table-scroll{max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:6px;}
+
+  footer{text-align:center;color:var(--muted);font-size:0.78rem;margin-top:30px;}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="wrap">
+    <h1>رفيقي في حفظ سورة يوسف</h1>
+    <div class="subtitle">تنظيم ومتابعة الحفظ استعدادًا للامتحان الجهوي</div>
+    <div class="overall-progress">
+      <div class="row">
+        <span>التقدّم الكلي</span>
+        <b id="overallText">0 من 111 آية</b>
+      </div>
+      <div class="bar-track"><div class="bar-fill" id="overallBar" style="width:0%"></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="tabs">
+    <button data-tab="daily" class="active">المتابعة اليومية</button>
+    <button data-tab="blocks">تقسيم السورة</button>
+    <button data-tab="schedule">الجدول الزمني</button>
+  </nav>
+
+  <main>
+    <!-- DAILY TAB -->
+    <section class="tab-panel active" id="tab-daily">
+      <div class="card">
+        <div class="today-date" id="todayDate"></div>
+        <h2>حفظ اليوم</h2>
+        <div class="goal-box" id="goalBox">لم يتم إنشاء جدول زمني بعد. يمكنك تسجيل تقدمك بحرية، أو الانتقال إلى تبويب «الجدول الزمني» لتحديد هدف يومي.</div>
+
+        <div class="counter-area">
+          <button class="counter-btn" id="btnMinus">−</button>
+          <div class="counter-value" id="counterValue">0</div>
+          <button class="counter-btn" id="btnPlus">+</button>
+        </div>
+
+        <div class="today-progress">
+          <div class="row"><span>إنجاز اليوم</span><span id="todayProgressText">0 / 5</span></div>
+          <div class="track-light"><div class="fill" id="todayBar" style="width:0%"></div></div>
+        </div>
+
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </section>
+
+    <!-- BLOCKS TAB -->
+    <section class="tab-panel" id="tab-blocks">
+      <div class="card">
+        <h2>مقاطع سورة يوسف (111 آية)</h2>
+        <div class="hint">اضغط على الحالة المناسبة لكل مقطع لتحديث تقدمك.</div>
+        <div class="legend">
+          <span><i class="dot new"></i> لم تبدأ</span>
+          <span><i class="dot focus"></i> يحتاج تركيز</span>
+          <span><i class="dot reviewing"></i> قيد المراجعة</span>
+          <span><i class="dot memorized"></i> محفوظ</span>
+        </div>
+        <div class="blocks-grid" id="blocksGrid"></div>
+      </div>
+    </section>
+
+    <!-- SCHEDULE TAB -->
+    <section class="tab-panel" id="tab-schedule">
+      <div class="card">
+        <h2>إنشاء جدول زمني</h2>
+        <div class="hint">يوزّع الجدول الآيات المتبقية (غير المحفوظة) على الأيام المتاحة قبل الامتحان.</div>
+
+        <div class="field">
+          <label>تاريخ البداية</label>
+          <input type="date" id="startDate">
+        </div>
+
+        <div class="mode-toggle">
+          <button data-mode="endDate" class="active" id="modeBtnEnd">تحديد تاريخ النهاية</button>
+          <button data-mode="perDay" id="modeBtnPerDay">تحديد عدد الآيات يوميًا</button>
+        </div>
+
+        <div class="field" id="fieldEndDate">
+          <label>تاريخ الامتحان / نهاية الحفظ</label>
+          <input type="date" id="endDate">
+        </div>
+
+        <div class="field" id="fieldPerDay" style="display:none;">
+          <label>عدد الآيات في اليوم</label>
+          <input type="number" id="perDayInput" min="1" value="5">
+        </div>
+
+        <button class="btn-primary" id="generateBtn">إنشاء الجدول</button>
+        <div class="schedule-note" id="scheduleSummary"></div>
+      </div>
+
+      <div class="card" id="scheduleResultCard" style="display:none;">
+        <h2>جدولك</h2>
+        <div class="table-scroll">
+          <table class="schedule-table">
+            <thead><tr><th>اليوم</th><th>التاريخ</th><th>الآيات</th></tr></thead>
+            <tbody id="scheduleBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>يُحفظ تقدمك تلقائيًا في متصفحك على هذا الجهاز.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var TOTAL_AYAT = 111;
+  var BLOCK_SIZE = 10;
+  var STORAGE_KEY = "yusufTrackerV1";
+
+  var STATUS = ["new","focus","reviewing","memorized"];
+  var STATUS_LABEL = {new:"لم تبدأ", focus:"يحتاج تركيز", reviewing:"قيد المراجعة", memorized:"محفوظ"};
+
+  function pad(n){ return n<10 ? "0"+n : ""+n; }
+  function todayStr(){
+    var d = new Date();
+    return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  }
+  function parseDate(s){
+    var p = s.split("-");
+    return new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
+  }
+  function formatDateHuman(dateObj){
+    var days = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+    var months = ["يناير","فبراير","مارس","أبريل","ماي","يونيو","يوليوز","غشت","شتنبر","أكتوبر","نونبر","دجنبر"];
+    return days[dateObj.getDay()] + "، " + dateObj.getDate() + " " + months[dateObj.getMonth()];
+  }
+  function dateKey(dateObj){
+    return dateObj.getFullYear()+"-"+pad(dateObj.getMonth()+1)+"-"+pad(dateObj.getDate());
+  }
+
+  function buildDefaultBlocks(){
+    var blocks = [];
+    var start = 1;
+    var idx = 1;
+    while(start <= TOTAL_AYAT){
+      var end = Math.min(start + BLOCK_SIZE - 1, TOTAL_AYAT);
+      blocks.push({ id: idx, start: start, end: end, status: "new" });
+      start = end + 1;
+      idx++;
+    }
+    return blocks;
+  }
+
+  function loadState(){
+    var raw = null;
+    try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){ raw = null; }
+    var defaults = {
+      blocks: buildDefaultBlocks(),
+      dailyLog: {},
+      schedule: null
+    };
+    if(!raw) return defaults;
+    try{
+      var parsed = JSON.parse(raw);
+      if(!parsed.blocks || parsed.blocks.length !== defaults.blocks.length){
+        parsed.blocks = defaults.blocks;
+      }
+      if(!parsed.dailyLog) parsed.dailyLog = {};
+      if(parsed.schedule === undefined) parsed.schedule = null;
+      return parsed;
+    }catch(e){
+      return defaults;
+    }
+  }
+
+  var state = loadState();
+
+  function save(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  /* ---------- Tabs ---------- */
+  var tabButtons = document.querySelectorAll("nav.tabs button");
+  var panels = document.querySelectorAll(".tab-panel");
+  tabButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabButtons.forEach(function(b){ b.classList.remove("active"); });
+      panels.forEach(function(p){ p.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    });
+  });
+
+  /* ---------- Overall progress ---------- */
+  function memorizedCount(){
+    var count = 0;
+    state.blocks.forEach(function(b){
+      if(b.status === "memorized") count += (b.end - b.start + 1);
+    });
+    return count;
+  }
+
+  function renderOverall(){
+    var count = memorizedCount();
+    var pct = Math.round((count / TOTAL_AYAT) * 100);
+    document.getElementById("overallText").textContent = count + " من " + TOTAL_AYAT + " آية";
+    document.getElementById("overallBar").style.width = pct + "%";
+  }
+
+  /* ---------- Blocks tab ---------- */
+  function renderBlocks(){
+    var grid = document.getElementById("blocksGrid");
+    grid.innerHTML = "";
+    state.blocks.forEach(function(block){
+      var card = document.createElement("div");
+      card.className = "block-card status-" + block.status;
+
+      var title = document.createElement("div");
+      title.className = "title";
+      title.textContent = "المقطع " + block.id;
+      card.appendChild(title);
+
+      var range = document.createElement("div");
+      range.className = "range";
+      range.textContent = block.start === block.end
+        ? "الآية " + block.start
+        : "الآيات " + block.start + " - " + block.end;
+      card.appendChild(range);
+
+      var chips = document.createElement("div");
+      chips.className = "status-chips";
+      STATUS.forEach(function(s){
+        var chip = document.createElement("button");
+        chip.className = "chip" + (block.status === s ? " active-" + s : "");
+        chip.textContent = STATUS_LABEL[s];
+        chip.addEventListener("click", function(){
+          block.status = s;
+          save();
+          renderBlocks();
+          renderOverall();
+        });
+        chips.appendChild(chip);
+      });
+      card.appendChild(chips);
+      grid.appendChild(card);
+    });
+  }
+
+  /* ---------- Daily tab ---------- */
+  function getTodayGoal(){
+    var key = todayStr();
+    if(state.schedule && state.schedule.days){
+      for(var i=0;i<state.schedule.days.length;i++){
+        var d = state.schedule.days[i];
+        if(d.dateKey === key){
+          return { count: d.count, range: d.start + "-" + d.end, fromSchedule: true };
+        }
+      }
+    }
+    return { count: 5, range: null, fromSchedule: false };
+  }
+
+  function renderGoalBox(){
+    var goal = getTodayGoal();
+    var box = document.getElementById("goalBox");
+    if(goal.fromSchedule){
+      box.innerHTML = "هدف اليوم حسب الجدول: <b>" + goal.count + " آية</b> (الآيات " + goal.range + ")";
+    } else if(state.schedule){
+      box.textContent = "لا يقع اليوم ضمن نطاق الجدول الحالي. الهدف الافتراضي: " + goal.count + " آيات.";
+    } else {
+      box.textContent = "لم يتم إنشاء جدول زمني بعد. الهدف الافتراضي لليوم: " + goal.count + " آيات. يمكنك ضبط جدول من تبويب «الجدول الزمني».";
+    }
+  }
+
+  function renderDaily(){
+    document.getElementById("todayDate").textContent = formatDateHuman(new Date());
+    var key = todayStr();
+    var value = state.dailyLog[key] || 0;
+    document.getElementById("counterValue").textContent = value;
+
+    var goal = getTodayGoal();
+    var pct = Math.min(100, Math.round((value / goal.count) * 100));
+    document.getElementById("todayProgressText").textContent = value + " / " + goal.count;
+    document.getElementById("todayBar").style.width = pct + "%";
+
+    renderGoalBox();
+    renderHistory();
+  }
+
+  function renderHistory(){
+    var list = document.getElementById("historyList");
+    var entries = Object.keys(state.dailyLog)
+      .filter(function(k){ return state.dailyLog[k] > 0; })
+      .sort()
+      .reverse()
+      .slice(0, 7);
+    if(entries.length === 0){
+      list.innerHTML = "";
+      return;
+    }
+    var html = "";
+    entries.forEach(function(k){
+      html += '<div class="history-row"><span>' + k + '</span><span>' + state.dailyLog[k] + ' آية</span></div>';
+    });
+    list.innerHTML = html;
+  }
+
+  document.getElementById("btnPlus").addEventListener("click", function(){
+    var key = todayStr();
+    state.dailyLog[key] = (state.dailyLog[key] || 0) + 1;
+    save();
+    renderDaily();
+  });
+  document.getElementById("btnMinus").addEventListener("click", function(){
+    var key = todayStr();
+    state.dailyLog[key] = Math.max(0, (state.dailyLog[key] || 0) - 1);
+    save();
+    renderDaily();
+  });
+
+  /* ---------- Schedule tab ---------- */
+  var currentMode = "endDate";
+  document.getElementById("modeBtnEnd").addEventListener("click", function(){
+    currentMode = "endDate";
+    document.getElementById("modeBtnEnd").classList.add("active");
+    document.getElementById("modeBtnPerDay").classList.remove("active");
+    document.getElementById("fieldEndDate").style.display = "block";
+    document.getElementById("fieldPerDay").style.display = "none";
+  });
+  document.getElementById("modeBtnPerDay").addEventListener("click", function(){
+    currentMode = "perDay";
+    document.getElementById("modeBtnPerDay").classList.add("active");
+    document.getElementById("modeBtnEnd").classList.remove("active");
+    document.getElementById("fieldPerDay").style.display = "block";
+    document.getElementById("fieldEndDate").style.display = "none";
+  });
+
+  document.getElementById("startDate").value = todayStr();
+
+  document.getElementById("generateBtn").addEventListener("click", function(){
+    var startVal = document.getElementById("startDate").value;
+    if(!startVal){
+      alert("الرجاء تحديد تاريخ البداية.");
+      return;
+    }
+    var start = parseDate(startVal);
+    var remaining = TOTAL_AYAT - memorizedCount();
+    var firstAyah = memorizedCount() + 1;
+
+    if(remaining <= 0){
+      document.getElementById("scheduleSummary").textContent = "لقد أتممت حفظ السورة بالكامل. لا حاجة لجدول جديد.";
+      document.getElementById("scheduleResultCard").style.display = "none";
+      return;
+    }
+
+    var days = [];
+    var perDay, totalDays;
+
+    if(currentMode === "endDate"){
+      var endVal = document.getElementById("endDate").value;
+      if(!endVal){
+        alert("الرجاء تحديد تاريخ النهاية.");
+        return;
+      }
+      var end = parseDate(endVal);
+      var diffMs = end.getTime() - start.getTime();
+      totalDays = Math.round(diffMs / (1000*60*60*24)) + 1;
+      if(totalDays < 1){
+        alert("تاريخ النهاية يجب أن يكون بعد تاريخ البداية.");
+        return;
+      }
+      perDay = Math.ceil(remaining / totalDays);
+    } else {
+      perDay = parseInt(document.getElementById("perDayInput").value, 10);
+      if(!perDay || perDay < 1){
+        alert("الرجاء إدخال عدد صحيح للآيات اليومية.");
+        return;
+      }
+      totalDays = Math.ceil(remaining / perDay);
+    }
+
+    var cursor = firstAyah;
+    for(var i=0; i<totalDays && cursor <= TOTAL_AYAT; i++){
+      var dEnd = Math.min(cursor + perDay - 1, TOTAL_AYAT);
+      var dObj = new Date(start.getTime());
+      dObj.setDate(dObj.getDate() + i);
+      days.push({
+        dayNumber: i+1,
+        dateKey: dateKey(dObj),
+        dateHuman: formatDateHuman(dObj),
+        start: cursor,
+        end: dEnd,
+        count: dEnd - cursor + 1
+      });
+      cursor = dEnd + 1;
+    }
+
+    state.schedule = { createdAt: todayStr(), days: days };
+    save();
+    renderSchedule();
+    renderDaily();
+  });
+
+  function renderSchedule(){
+    var summary = document.getElementById("scheduleSummary");
+    var resultCard = document.getElementById("scheduleResultCard");
+    if(!state.schedule || !state.schedule.days || state.schedule.days.length === 0){
+      resultCard.style.display = "none";
+      return;
+    }
+    var days = state.schedule.days;
+    var lastDay = days[days.length-1];
+    summary.textContent = "المدة: " + days.length + " يومًا، بمعدل يقارب " +
+      Math.ceil((TOTAL_AYAT - memorizedCount()) / days.length) + " آيات في اليوم، حتى " + lastDay.dateHuman + ".";
+
+    var body = document.getElementById("scheduleBody");
+    var html = "";
+    var todayKey = todayStr();
+    days.forEach(function(d){
+      var rowClass = d.dateKey === todayKey ? ' class="today-row"' : "";
+      var ayahText = d.start === d.end ? ("آية " + d.start) : ("الآيات " + d.start + "-" + d.end);
+      html += "<tr" + rowClass + "><td>اليوم " + d.dayNumber + "</td><td>" + d.dateHuman + "</td><td>" + ayahText + "</td></tr>";
+    });
+    body.innerHTML = html;
+    resultCard.style.display = "block";
+  }
+
+  /* ---------- Init ---------- */
+  renderOverall();
+  renderBlocks();
+  renderDaily();
+  renderSchedule();
+
+})();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){ /* offline caching unavailable, app still works online */ });
+  });
+}
+</script>
+
+</body>
+</html>
