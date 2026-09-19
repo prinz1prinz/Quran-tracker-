@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.prinz1prinz.twa",
+    "sha256_cert_fingerprints": [
+      "2F:CC:B5:2F:21:CE:6B:83:CB:35:D3:A7:20:0A:8B:A5:D3:08:4A:7A:92:8C:8B:B1:07:CC:81:3D:FD:D3:47:66"
+    ]
+  }
+}]
